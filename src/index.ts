@@ -4,7 +4,7 @@ import compression from 'compression'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
-import https from 'https'
+import { createServer } from 'https'
 import fs from 'fs'
 import cors from 'cors'
 import { graphqlServer } from './graphql'
@@ -20,7 +20,7 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-const server = https.createServer(
+const server = createServer(
     {
         key: fs.readFileSync(`${__dirname}/certs/localhost.key`),
         cert: fs.readFileSync(`${__dirname}/certs/localhost.crt`),

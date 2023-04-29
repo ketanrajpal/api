@@ -2,12 +2,15 @@ import { gql } from 'graphql-tag'
 
 export default gql`
     type User {
-        id: ID!
-        name: String!
+        _id: ID!
+        firstName: String!
+        lastName: String!
         email: String!
-        password: String!
+        terms: Boolean!
         createdAt: String!
-        updatedAt: String!
+        updatedAt: String
+        lastLogin: String
+        active: Boolean!
     }
 
     extend type Query {
@@ -20,6 +23,12 @@ export default gql`
 
     extend type Mutation {
         "create new user"
-        createUser(name: String!, email: String!, password: String!): User!
+        createUser(
+            firstName: String!
+            lastName: String!
+            email: String!
+            password: String!
+            terms: Boolean!
+        ): User!
     }
 `
