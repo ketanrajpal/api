@@ -1,4 +1,4 @@
-import { pubsub } from '../../graphql'
+import { pubsub } from '@/utils/graphql'
 
 const domains = [
     {

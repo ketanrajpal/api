@@ -1,4 +1,4 @@
-import { connection } from '../../../utils/database'
+import { connection } from '@/utils/database'
 
 export default async () => {
     const { database, client } = await connection()

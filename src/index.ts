@@ -7,7 +7,7 @@ import bodyParser from 'body-parser'
 import { createServer } from 'https'
 import fs from 'fs'
 import cors from 'cors'
-import { graphqlServer } from './graphql'
+import { graphqlServer } from '@/utils/graphql'
 
 const app = express()
 

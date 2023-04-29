@@ -5,11 +5,11 @@ import { Server } from 'https'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 
-import domainTypedefs from './components/domain/typedefs'
-import domainResolvers from './components/domain/resolvers'
+import domainTypedefs from '@/components/domain/typedefs'
+import domainResolvers from '@/components/domain/resolvers'
 
-import userTypedefs from './components/user/typedefs'
-import userResolvers from './components/user/resolvers'
+import userTypedefs from '@/components/user/typedefs'
+import userResolvers from '@/components/user/resolvers'
 
 import { PubSub } from 'graphql-subscriptions'
 

@@ -1,6 +1,5 @@
-import createUser from './mutation/createUser'
-
-import users from './query/users'
+import createUser from '@/components/user/mutation/createUser'
+import users from '@/components/user/query/users'
 
 export default {
     Query: {
