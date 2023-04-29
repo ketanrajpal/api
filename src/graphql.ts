@@ -1,41 +1,23 @@
 import { ApolloServer } from '@apollo/server'
+import { buildSubgraphSchema } from '@apollo/subgraph'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import https from 'https'
 
+import domainTypedefs from './components/domain/typedefs'
+import domainResolvers from './components/domain/resolvers'
+
+import userTypedefs from './components/user/typedefs'
+import userResolvers from './components/user/resolvers'
+
+/** graphql sever */
 export const graphqlServer = async (server: https.Server) => {
-    const books = [
-        {
-            title: 'The Awakening',
-            author: 'Kate Chopin',
-        },
-        {
-            title: 'City of Glass',
-            author: 'Paul Auster',
-        },
-    ]
-
-    const typeDefs =
-        /* GraphQL */
-        `
-            type Book {
-                title: String
-                author: String
-            }
-
-            type Query {
-                books: [Book]
-            }
-        `
-
-    const resolvers = {
-        Query: {
-            books: () => books,
-        },
-    }
+    const schema = buildSubgraphSchema([
+        { typeDefs: domainTypedefs, resolvers: domainResolvers },
+        { typeDefs: userTypedefs, resolvers: userResolvers },
+    ])
 
     const apolloServer = new ApolloServer({
-        typeDefs,
-        resolvers,
+        schema,
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer: server })],
     })
 
