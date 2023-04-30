@@ -1,4 +1,4 @@
-import { IContext } from '../../../graphql/server'
+import { IContext } from '../../../graphql/context'
 
 import { connection } from '../../../utils/database'
 import { create_error, IError } from '../../../utils/error'
@@ -7,14 +7,18 @@ import { compare_password } from '../../../utils/bcrypt'
 import { create_access_token, create_refresh_token } from '../../../utils/jwt'
 
 import { create_secure_cookie } from '../../../utils/cookie'
-import { IUser } from '../../user/typedefs'
+import { IUser } from '../../user/user'
 
 interface ILoginArgs {
     email: string
     password: string
 }
 
-export default async (parent: any, args: ILoginArgs, context: IContext) => {
+export default async (
+    parent: undefined,
+    args: ILoginArgs,
+    context: IContext
+) => {
     const error: IError[] = []
 
     const email = _email(args.email, true)

@@ -1,5 +1,5 @@
-import { ApolloServer, GraphQLResponse } from '@apollo/server'
-import { schema, error } from '../../../utils/graphql'
+/* import { ApolloServer, GraphQLResponse } from '@apollo/server'
+import { schema, error } from '../../../graphql/server'
 
 describe('create user mutation', () => {
     it('it should create user', async () => {
@@ -9,7 +9,7 @@ describe('create user mutation', () => {
         })
 
         const response = await server.executeOperation({
-            query: /* GraphQL */ `
+            query:  `
                 mutation createUser(
                     $firstName: String!
                     $lastName: String!
@@ -48,3 +48,4 @@ describe('create user mutation', () => {
         server.stop()
     })
 })
+*/

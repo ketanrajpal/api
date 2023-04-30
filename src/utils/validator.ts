@@ -1,21 +1,16 @@
 import validator from 'validator'
 
-interface IEscape {
-    (string: string): string
-}
-
 /** escape string validator */
-export const escape: IEscape = (string) => {
+export const escape = (string: string): string => {
     string = validator.trim(string)
     return validator.escape(string)
 }
 
-interface IAlpha {
-    (string: string, required: boolean): { code: string | null; value: string }
-}
-
 /** alpha validator */
-export const _alpha: IAlpha = (string, required) => {
+export const _alpha = (
+    string: string,
+    required: boolean
+): { code: string | null; value: string } => {
     let code: string | null = null
     string = escape(string)
     if (required && string.length === 0) code = 'FIELD_REQUIRED'
@@ -23,12 +18,11 @@ export const _alpha: IAlpha = (string, required) => {
     return { code, value: string }
 }
 
-interface IAlphaWithSpaces {
-    (string: string, required: boolean): { code: string | null; value: string }
-}
-
 /** alpha with spaces validator */
-export const _alpha_with_spaces: IAlphaWithSpaces = (string, required) => {
+export const _alpha_with_spaces = (
+    string: string,
+    required: boolean
+): { code: string | null; value: string } => {
     let code: string | null = null
     string = escape(string)
     if (required && string.length === 0) code = 'FIELD_REQUIRED'
@@ -40,12 +34,11 @@ export const _alpha_with_spaces: IAlphaWithSpaces = (string, required) => {
     return { code, value: string }
 }
 
-interface IBoolean {
-    (string: string, required: boolean): { code: string | null; value: boolean }
-}
-
 /** boolean validator */
-export const _boolean: IBoolean = (string, required) => {
+export const _boolean = (
+    string: string,
+    required: boolean
+): { code: string | null; value: boolean } => {
     let code: string | null = null
     string = escape(string)
     if (required && string.length === 0) code = 'FIELD_REQUIRED'
@@ -54,12 +47,11 @@ export const _boolean: IBoolean = (string, required) => {
     return { code, value: validator.toBoolean(string) }
 }
 
-interface IEmail {
-    (email: string, required: boolean): { code: string | null; value: string }
-}
-
 /** email validator */
-export const _email: IEmail = (email, required) => {
+export const _email = (
+    email: string,
+    required: boolean
+): { code: string | null; value: string } => {
     let code: string | null = null
     email = escape(email).toLowerCase()
     if (required && email.length === 0) code = 'FIELD_REQUIRED'
@@ -67,15 +59,14 @@ export const _email: IEmail = (email, required) => {
     return { code, value: email }
 }
 
-interface IPassword {
-    (password: string, required: boolean): {
-        code: string | null
-        value: string
-    }
-}
-
 /** password validator */
-export const _password: IPassword = (password, required) => {
+export const _password = (
+    password: string,
+    required: boolean
+): {
+    code: string | null
+    value: string
+} => {
     let code: string | null = null
     password = escape(password)
     if (required && password.length === 0) code = 'FIELD_REQUIRED'

@@ -3,13 +3,11 @@ export interface IError {
     field: string
     message: string
 }
-export interface IErrorCodes {
-    [key: string]: string
-}
 
 /** error codes */
-const error_codes: IErrorCodes = {
-    ALPHA_WITH_SPACES_INVALID: 'field {field} must contain only letters and spaces',
+const error_codes: { [key: string]: string } = {
+    ALPHA_WITH_SPACES_INVALID:
+        'field {field} must contain only letters and spaces',
     EMAIL_ALREADY_EXIST: 'email address already exists',
     EMAIL_INVALID: 'email address is invalid',
     EMAIL_NOT_FOUND: 'email address not found',
@@ -21,12 +19,8 @@ const error_codes: IErrorCodes = {
     UNAUTHORIZED: 'you are not authorized to access this resource',
 }
 
-interface ICreateMessage {
-    (code: string, field: string): string
-}
-
 /** create error message */
-export const create_message: ICreateMessage = (code, field) => {
+export const create_message = (code: string, field: string): string => {
     try {
         return error_codes[code].replace('{field}', field.replace('_', ' '))
     } catch (error) {
@@ -34,12 +28,8 @@ export const create_message: ICreateMessage = (code, field) => {
     }
 }
 
-interface ICreateError {
-    (error: IError[], field: string, code: string): void
-}
-
 /** create error object */
-export const create_error: ICreateError = (error, field, code) => {
+export const create_error = (error: IError[], field: string, code: string) => {
     error.push({
         code,
         field,

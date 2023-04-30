@@ -1,4 +1,3 @@
-import { Request, Response } from 'express'
 import { ApolloServer } from '@apollo/server'
 
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -6,15 +5,9 @@ import { Server } from 'https'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 
-import schema from '../graphql/schema'
-import error from '../graphql/error'
-import { IUser } from '../components/user/typedefs'
-
-export interface IContext {
-    request: Request
-    response: Response
-    user: IUser | null
-}
+import schema from './schema'
+import error from './error'
+import { IContext } from './context'
 
 /** graphql sever */
 export default async (server: Server) => {

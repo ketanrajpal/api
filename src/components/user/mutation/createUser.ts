@@ -16,7 +16,7 @@ interface ICreateUserArgs {
     terms: boolean
 }
 
-export default async (parent: any, args: ICreateUserArgs) => {
+export default async (parent: undefined, args: ICreateUserArgs) => {
     const error: IError[] = []
 
     const first_name = _alpha_with_spaces(args.firstName, true)
@@ -42,8 +42,7 @@ export default async (parent: any, args: ICreateUserArgs) => {
 
     const terms = _boolean(args.terms.toString(), true)
     if (terms.code !== null) create_error(error, 'terms', terms.code)
-    else if (terms.value === false)
-        create_error(error, 'terms', 'TERMS_NOT_ACCEPTED')
+    else if (!terms.value) create_error(error, 'terms', 'TERMS_NOT_ACCEPTED')
 
     if (error.length > 0) throw error
 

@@ -20,12 +20,12 @@ const domains = [
 export default {
     Query: {
         domains: () => domains,
-        domain: (parent: any, args: any) => {
+        domain: (parent: undefined, args: { id: number }) => {
             return domains.find((domain) => domain.id === args.id)
         },
     },
     Mutation: {
-        createDomain: (parent: any, args: any) => {
+        createDomain: (parent: undefined, args: { name: string }) => {
             const domain = {
                 id: domains.length + 1,
                 name: args.name,
@@ -37,7 +37,10 @@ export default {
             pubsub.publish('domainCreated', { domainCreated: domain })
             return domain
         },
-        updateDomain: (parent: any, args: any) => {
+        updateDomain: (
+            parent: undefined,
+            args: { id: number; name: string }
+        ) => {
             const domain = domains.find((domain) => domain.id === args.id)
             if (!domain) {
                 throw new Error('Domain not found')
@@ -57,7 +60,7 @@ export default {
         },
     },
     Domain: {
-        createdBy: (parent: any) => {
+        createdBy: (parent: undefined) => {
             //return users.find((user) => user.id === parent.createdBy)
         },
     },
