@@ -1,12 +1,12 @@
-import { connection } from '@/utils/database'
+import { connection } from '../../../utils/database'
 import {
     _alpha_with_spaces,
     _email,
     _password,
     _boolean,
-} from '@/utils/validator'
-import { create_error, IError } from '@/utils/error'
-import { hash_password } from '@/utils/bcrypt'
+} from '../../../utils/validator'
+import { create_error, IError } from '../../../utils/error'
+import { hash_password } from '../../../utils/bcrypt'
 
 interface ICreateUserArgs {
     firstName: string

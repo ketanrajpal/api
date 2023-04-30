@@ -1,11 +1,11 @@
-import createUser from '@/components/user/mutation/createUser'
-import users from '@/components/user/query/users'
+import createUser from './mutation/createUser'
+import users from './query/users'
 
 export default {
     Query: {
-        users: users,
+        users,
     },
     Mutation: {
-        createUser: createUser,
+        createUser,
     },
 }
