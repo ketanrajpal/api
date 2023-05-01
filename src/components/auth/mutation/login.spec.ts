@@ -84,7 +84,7 @@ describe('login mutation', () => {
         expect(response.body.data).toBeNull()
     })
 
-    it(`email doesn't exist`, async () => {
+    it(`email not exist`, async () => {
         const response = await await request
             .post('/graphql')
             .trustLocalhost()

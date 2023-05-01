@@ -8,7 +8,6 @@ import { create_access_token, create_refresh_token } from '../../../utils/jwt'
 
 import { create_secure_cookie } from '../../../utils/cookie'
 import { IUser } from '../../user/user'
-import { GraphQLError } from 'graphql'
 
 interface ILoginArgs {
     email: string

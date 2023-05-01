@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "ci": "NODE_ENV=test jest --runInBand --coverage",
+    "deepsource": "DEEPSOURCE_DSN=https://fd88f70525d94b0aa02b6963e4d33643@app.deepsource.com ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/cobertura-coverage.xml",
     "dev": "NODE_ENV=development nodemon --exec ts-node src/index.ts",
     "lint": "eslint src",
     "format": "npx prettier --write src",
