@@ -8,6 +8,7 @@ import { create_access_token, create_refresh_token } from '../../../utils/jwt'
 
 import { create_secure_cookie } from '../../../utils/cookie'
 import { IUser } from '../../user/user'
+import { GraphQLError } from 'graphql'
 
 interface ILoginArgs {
     email: string
@@ -36,7 +37,12 @@ export default async (
 
     if (!user) {
         create_error(error, 'email', 'EMAIL_NOT_FOUND')
-        throw error
+        throw new GraphQLError('UNPROCESSABLE_CONTENT', {
+            extensions: {
+                code: 'UNPROCESSABLE_CONTENT',
+                errors: error,
+            },
+        })
     } else {
         const password_match = compare_password(password.value, user.password)
         if (!password_match) {

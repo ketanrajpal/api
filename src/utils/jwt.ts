@@ -1,5 +1,5 @@
 import jwt, { Secret } from 'jsonwebtoken'
-import { IUser } from '../components/user/typedefs'
+import { IUser } from '../components/user/user'
 
 /** payload interface */
 export interface IPayload {

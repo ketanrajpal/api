@@ -1,0 +1,4 @@
+{
+    "jest.showCoverageOnLoad": true,
+    "jest.jestCommandLine": "NODE_ENV=test node_modules/.bin/jest --coverage --config jest.config.ts --runInBand"
+}

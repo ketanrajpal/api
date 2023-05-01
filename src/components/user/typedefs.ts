@@ -1,18 +1,5 @@
 import { gql } from 'graphql-tag'
 
-export interface IUser {
-    _id: string
-    firstName: string
-    lastName: string
-    email: string
-    password: string
-    terms: boolean
-    createdAt: string
-    updatedAt: string
-    lastLogin: string
-    active: boolean
-}
-
 export default gql`
     type User {
         _id: ID!

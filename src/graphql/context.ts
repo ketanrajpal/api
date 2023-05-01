@@ -14,7 +14,13 @@ export default async ({ req, res }: { req: Request; res: Response }) => {
     let user: IUser | null = null
 
     if ('accessToken' in req.cookies) {
-        const payload = verify_access_token(req.cookies.accessToken)
+        let payload = null
+        try {
+            payload = verify_access_token(req.cookies.accessToken)
+        } catch (e) {
+            payload = null
+        }
+
         if (payload) {
             const { database, client } = await connection()
             const collection = database.collection('users', {})
