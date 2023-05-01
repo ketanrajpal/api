@@ -17,6 +17,7 @@ const error_codes: { [key: string]: string } = {
         'password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
     TERMS_NOT_ACCEPTED: 'terms and conditions must be accepted',
     UNAUTHORIZED: 'you are not authorized to access this resource',
+    UNKNOWN_ERROR: 'unknown error',
 }
 
 /** create error message */

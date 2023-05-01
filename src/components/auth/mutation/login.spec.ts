@@ -1,22 +1,14 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
 import { connection } from '../../../utils/database'
+import {
+    query as createUserQuery,
+    variable as createUserVariable,
+} from '../../user/mutation/createUser.spec'
 
-export const query = /* GraphQL */ `
-    mutation CreateUser(
-        $firstName: String!
-        $lastName: String!
-        $email: String!
-        $password: String!
-        $terms: Boolean!
-    ) {
-        createUser(
-            firstName: $firstName
-            lastName: $lastName
-            email: $email
-            password: $password
-            terms: $terms
-        ) {
+const query = /* GraphQL */ `
+    mutation Login($email: String!, $password: String!) {
+        login(email: $email, password: $password) {
             _id
             firstName
             lastName
@@ -30,15 +22,12 @@ export const query = /* GraphQL */ `
     }
 `
 
-export const variable = {
-    firstName: 'John',
-    lastName: 'Doe',
+const variable = {
     email: 'john.doe@mail.com',
     password: 'Password@123!',
-    terms: true,
 }
 
-describe('create user mutation', () => {
+describe('login mutation', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
@@ -46,85 +35,15 @@ describe('create user mutation', () => {
         const collection = database.collection('users', {})
         await collection.deleteMany({})
         client.close()
+
+        await request.post('/graphql').trustLocalhost().send({
+            query: createUserQuery,
+            variables: createUserVariable,
+        })
     })
 
     afterAll(() => {
         server.close()
-    })
-
-    it('empty first name', async () => {
-        const response = await request
-            .post('/graphql')
-            .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                    firstName: '',
-                },
-            })
-
-        const errors = response.body.errors[0].message
-        expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('FIELD_REQUIRED')
-        expect(errors[0].field).toBe('firstName')
-    })
-
-    it('invalid first name', async () => {
-        const response = await request
-            .post('/graphql')
-            .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                    firstName: 'John123',
-                },
-            })
-
-        const errors = response.body.errors[0].message
-        expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('ALPHA_WITH_SPACES_INVALID')
-        expect(errors[0].field).toBe('firstName')
-        expect(response.body.data).toBeNull()
-    })
-
-    it('empty last name', async () => {
-        const response = await request
-            .post('/graphql')
-            .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                    lastName: '',
-                },
-            })
-
-        const errors = response.body.errors[0].message
-        expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('FIELD_REQUIRED')
-        expect(errors[0].field).toBe('lastName')
-        expect(response.body.data).toBeNull()
-    })
-
-    it('invalid last name', async () => {
-        const response = await request
-            .post('/graphql')
-            .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                    lastName: 'Doe123',
-                },
-            })
-
-        const errors = response.body.errors[0].message
-        expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('ALPHA_WITH_SPACES_INVALID')
-        expect(errors[0].field).toBe('lastName')
-        expect(response.body.data).toBeNull()
     })
 
     it('empty email', async () => {
@@ -161,6 +80,25 @@ describe('create user mutation', () => {
         const errors = response.body.errors[0].message
         expect(errors).toBeInstanceOf(Array)
         expect(errors[0].code).toBe('EMAIL_INVALID')
+        expect(errors[0].field).toBe('email')
+        expect(response.body.data).toBeNull()
+    })
+
+    it(`email doesn't exist`, async () => {
+        const response = await await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send({
+                query,
+                variables: {
+                    ...variable,
+                    email: 'noemail@account.com',
+                },
+            })
+
+        const errors = response.body.errors[0].message
+        expect(errors).toBeInstanceOf(Array)
+        expect(errors[0].code).toBe('EMAIL_NOT_FOUND')
         expect(errors[0].field).toBe('email')
         expect(response.body.data).toBeNull()
     })
@@ -203,7 +141,7 @@ describe('create user mutation', () => {
         expect(response.body.data).toBeNull()
     })
 
-    it('invalid terms', async () => {
+    it('wrong password', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
@@ -211,46 +149,41 @@ describe('create user mutation', () => {
                 query,
                 variables: {
                     ...variable,
-                    terms: false,
+                    password: 'Wrong@Password@123!',
                 },
             })
 
         const errors = response.body.errors[0].message
         expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('TERMS_NOT_ACCEPTED')
-        expect(errors[0].field).toBe('terms')
+        expect(errors[0].code).toBe('INVALID_AUTH')
+        expect(errors[0].field).toBe('password')
         expect(response.body.data).toBeNull()
     })
 
-    it('valid user', async () => {
+    it('valid login', async () => {
         const response = await request.post('/graphql').trustLocalhost().send({
             query,
             variables: variable,
         })
 
-        const data = response.body.data.createUser
+        const cookies: string[] = []
+        response
+            .get('Set-Cookie')
+            .forEach((cookie) => cookies.push(cookie.split('=')[0]))
+
+        expect(cookies).toContain('accessToken')
+        expect(cookies).toContain('refreshToken')
+
+        const data = response.body.data.login
         expect(data).toHaveProperty('_id')
-        expect(data).toHaveProperty('firstName', variable.firstName)
-        expect(data).toHaveProperty('lastName', variable.lastName)
-        expect(data).toHaveProperty('email', variable.email)
-        expect(data).toHaveProperty('terms', variable.terms)
+        expect(data).toHaveProperty('firstName', createUserVariable.firstName)
+        expect(data).toHaveProperty('lastName', createUserVariable.lastName)
+        expect(data).toHaveProperty('email', createUserVariable.email)
+        expect(data).toHaveProperty('terms', createUserVariable.terms)
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
         expect(data).toHaveProperty('lastLogin')
         expect(data).toHaveProperty('active', true)
         expect(response.body).not.toHaveProperty('errors')
-    })
-
-    it('duplicate user email', async () => {
-        const response = await request.post('/graphql').trustLocalhost().send({
-            query,
-            variables: variable,
-        })
-
-        const errors = response.body.errors[0].message
-        expect(errors).toBeInstanceOf(Array)
-        expect(errors[0].code).toBe('EMAIL_ALREADY_EXIST')
-        expect(errors[0].field).toBe('email')
-        expect(response.body.data).toBeNull()
     })
 })

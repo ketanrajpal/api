@@ -11,7 +11,7 @@ import cors from 'cors'
 import graphqlServer from './graphql/server'
 import context from './graphql/context'
 
-dotenv.config()
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
 const app = express()
 
@@ -29,17 +29,13 @@ app.use(
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-let server = null
-
-if (process.env.NODE_ENV === 'development') {
-    server = createServer(
-        {
-            key: fs.readFileSync(`${__dirname}/certs/localhost.key`),
-            cert: fs.readFileSync(`${__dirname}/certs/localhost.crt`),
-        },
-        app
-    )
-} else server = createServer(app)
+export const server = createServer(
+    {
+        key: fs.readFileSync(`${__dirname}/certs/localhost.key`),
+        cert: fs.readFileSync(`${__dirname}/certs/localhost.crt`),
+    },
+    app
+).listen({ port: process.env.PORT })
 
 graphqlServer(server).then((apolloServer) => {
     app.use(
@@ -49,5 +45,3 @@ graphqlServer(server).then((apolloServer) => {
         })
     )
 })
-
-server.listen({ port: process.env.PORT })

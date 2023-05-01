@@ -28,7 +28,7 @@ export default async (
     const password = _password(args.password, true)
     if (password.code !== null) create_error(error, 'password', password.code)
 
-    if (error.length > 0) throw error
+    if (error.length > 0) throw new Error(JSON.stringify(error))
 
     const { database, client } = await connection()
     const collection = database.collection('users', {})
@@ -37,17 +37,12 @@ export default async (
 
     if (!user) {
         create_error(error, 'email', 'EMAIL_NOT_FOUND')
-        throw new GraphQLError('UNPROCESSABLE_CONTENT', {
-            extensions: {
-                code: 'UNPROCESSABLE_CONTENT',
-                errors: error,
-            },
-        })
+        throw new Error(JSON.stringify(error))
     } else {
         const password_match = compare_password(password.value, user.password)
         if (!password_match) {
             create_error(error, 'password', 'INVALID_AUTH')
-            throw error
+            throw new Error(JSON.stringify(error))
         } else {
             const access_token = create_access_token(user)
             const refresh_token = create_refresh_token(user)

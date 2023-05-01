@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server'
 
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace'
 import { Server } from 'https'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
@@ -17,6 +18,7 @@ export default async (server: Server) => {
         schema,
         formatError: error,
         plugins: [
+            ApolloServerPluginInlineTrace(),
             ApolloServerPluginDrainHttpServer({ httpServer: server }),
             {
                 async serverWillStart() {

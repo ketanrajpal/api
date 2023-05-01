@@ -44,7 +44,7 @@ export default async (parent: undefined, args: ICreateUserArgs) => {
     if (terms.code !== null) create_error(error, 'terms', terms.code)
     else if (!terms.value) create_error(error, 'terms', 'TERMS_NOT_ACCEPTED')
 
-    if (error.length > 0) throw error
+    if (error.length > 0) throw new Error(JSON.stringify(error))
 
     const user = {
         firstName: args.firstName,
@@ -57,15 +57,20 @@ export default async (parent: undefined, args: ICreateUserArgs) => {
         active: true,
     }
 
-    const { database, client } = await connection()
-    const collection = database.collection('users', {})
-    const result = await collection.insertOne(user)
-    const inserted_record = await collection.findOne(
-        { _id: result.insertedId },
-        { projection: { password: 0, salt: 0 } }
-    )
+    try {
+        const { database, client } = await connection()
+        const collection = database.collection('users', {})
+        const result = await collection.insertOne(user)
+        const inserted_record = await collection.findOne(
+            { _id: result.insertedId },
+            { projection: { password: 0, salt: 0 } }
+        )
 
-    client.close()
+        client.close()
 
-    return inserted_record
+        return inserted_record
+    } catch (e) {
+        create_error(error, 'email', 'UNKNOWN_ERROR')
+        throw new Error(JSON.stringify(error))
+    }
 }

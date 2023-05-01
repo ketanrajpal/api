@@ -21,6 +21,6 @@ export default async (
         return user
     } else {
         create_error(error, 'user', 'UNAUTHORIZED')
-        throw error
+        throw new Error(JSON.stringify(error))
     }
 }
