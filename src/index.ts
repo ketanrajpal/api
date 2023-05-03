@@ -21,7 +21,7 @@ app.disable('x-powered-by')
 app.use(cookieParser())
 app.use(
     cors({
-        origin: 'https://studio.apollographql.com',
+        origin: ['https://studio.apollographql.com', 'https://localhost:3000'],
         credentials: true,
     })
 )

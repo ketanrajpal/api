@@ -6,7 +6,7 @@ import {
     variable as createUserVariable,
 } from '../../user/mutation/createUser.spec'
 
-const query = /* GraphQL */ `
+export const query = /* GraphQL */ `
     mutation Login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
             _id
@@ -22,7 +22,7 @@ const query = /* GraphQL */ `
     }
 `
 
-const variable = {
+export const variable = {
     email: 'john.doe@mail.com',
     password: 'Password@123!',
 }
