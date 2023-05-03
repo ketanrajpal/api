@@ -26,7 +26,7 @@ export default async (server: Server) => {
             ApolloServerPluginDrainHttpServer({ httpServer: server }),
             {
                 async serverWillStart() {
-                    return {
+                    return await {
                         async drainServer() {
                             await serverCleanup.dispose()
                         },
