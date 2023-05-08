@@ -8,11 +8,13 @@ export interface IError {
 const error_codes: { [key: string]: string } = {
     ALPHA_WITH_SPACES_INVALID:
         'field {field} must contain only letters and spaces',
+    COMPONENT_ALREADY_EXIST: 'component name already exists',
     EMAIL_ALREADY_EXIST: 'email address already exists',
     EMAIL_INVALID: 'email address is invalid',
     EMAIL_NOT_FOUND: 'email address not found',
     FIELD_REQUIRED: 'missing required field {field}',
     INVALID_AUTH: 'email address and password do not match',
+    OBJECT_ID_INVALID: 'object id is invalid',
     PASSWORD_INVALID:
         'password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
     TERMS_NOT_ACCEPTED: 'terms and conditions must be accepted',

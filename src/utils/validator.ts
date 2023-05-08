@@ -74,3 +74,24 @@ export const _password = (
         code = 'PASSWORD_INVALID'
     return { code, value: password }
 }
+
+/** mongo db object id */
+export const _object_id = (
+    id: string,
+    required: boolean
+): { code: string | null; value: string } => {
+    let code: string | null = null
+    id = escape(id)
+    if (required && id.length === 0) code = 'FIELD_REQUIRED'
+    if (id.length > 0 && !validator.isMongoId(id)) code = 'OBJECT_ID_INVALID'
+    return { code, value: id }
+}
+
+/** create slug */
+export const _slug = (name: string): string => {
+    let slug = name.toLowerCase()
+    slug = slug.replace(/[^a-z0-9\s-]/g, '')
+    slug = slug.replace(/[\s-]+/g, ' ')
+    slug = slug.replace(/[\s_]/g, '-')
+    return slug
+}
