@@ -1,12 +1,12 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
-import { connection } from '../../../utils/database'
 import {
     query as createUserQuery,
     variable as createUserVariable,
 } from '../../user/mutation/createUser.spec'
 import { query as loginQuery, variable as loginVariable } from './login.spec'
 import { query as meQuery } from '../query/me.spec'
+import Service from '@/utils/service'
 
 const query = /* GraphQL */ `
     mutation Logout {
@@ -18,10 +18,8 @@ describe('me query', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
-        const { database, client } = await connection()
-        const collection = database.collection('users', {})
-        await collection.deleteMany({})
-        client.close()
+        const users_service = new Service('users')
+        users_service.deleteAll()
 
         await request.post('/graphql').trustLocalhost().send({
             query: createUserQuery,

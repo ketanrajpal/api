@@ -11,8 +11,10 @@ export default async (
 ) => {
     const error: IError[] = []
     if (context.user) {
-        const user_service = new Service<IUser>('users')
-        const user = await user_service.findById(new ObjectId(context.user._id))
+        const users_service = new Service<IUser>('users')
+        const user = await users_service.findById(
+            new ObjectId(context.user._id)
+        )
         return user
     } else {
         create_error(error, 'user', 'UNAUTHORIZED')

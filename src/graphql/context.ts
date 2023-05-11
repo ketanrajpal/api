@@ -22,8 +22,8 @@ export default async ({ req, res }: { req: Request; res: Response }) => {
         }
 
         if (payload) {
-            const user_service = new Service<IUser>('users')
-            user = await user_service.findById(new ObjectId(payload._id))
+            const users_service = new Service<IUser>('users')
+            user = await users_service.findById(new ObjectId(payload._id))
         }
     }
 

@@ -11,7 +11,7 @@ import Services from '@/utils/service'
 import { IUser, IUserInput } from '../user'
 
 export default async (parent: undefined, args: IUserInput) => {
-    const user_service = new Services<IUser>('users')
+    const users_service = new Services<IUser>('users')
     const error: IError[] = []
 
     const first_name = _alpha_with_spaces(args.firstName, true)
@@ -24,7 +24,7 @@ export default async (parent: undefined, args: IUserInput) => {
     const email = _email(args.email, true)
     if (email.code !== null) create_error(error, 'email', email.code)
     else {
-        const user_exist = await user_service.findOne({ email: email.value })
+        const user_exist = await users_service.findOne({ email: email.value })
         if (user_exist) create_error(error, 'email', 'EMAIL_ALREADY_EXIST')
     }
 
@@ -50,8 +50,8 @@ export default async (parent: undefined, args: IUserInput) => {
     }
 
     try {
-        const result = await user_service.insertOne(user)
-        const created_user = await user_service.findById(result.insertedId)
+        const result = await users_service.insertOne(user)
+        const created_user = await users_service.findById(result.insertedId)
         return created_user
     } catch (e) {
         create_error(error, 'email', 'UNKNOWN_ERROR')

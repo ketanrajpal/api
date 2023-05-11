@@ -1,4 +1,4 @@
-import { connection } from '../../../utils/database'
+import Service from '@/utils/service'
 import { create_error, IError } from '../../../utils/error'
 import { _alpha_with_spaces, _slug } from '../../../utils/validator'
 interface ICreateComponentArgs {
@@ -7,6 +7,7 @@ interface ICreateComponentArgs {
 
 export default async (parent: undefined, args: ICreateComponentArgs) => {
     const error: IError[] = []
+    const components_service = new Service('components')
 
     const name = _alpha_with_spaces(args.name, true)
     if (name.code !== null) create_error(error, 'name', name.code)
@@ -14,14 +15,8 @@ export default async (parent: undefined, args: ICreateComponentArgs) => {
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
     const slug = _slug(name.value)
-    try {
-        const { database, client } = await connection()
-        const collection = database.collection('components', {})
-        const component_exist = await collection.findOne({ slug })
-        client.close()
-        if (component_exist)
-            create_error(error, 'name', 'COMPONENT_ALREADY_EXIST')
-    } catch (e) {
+    const component_exist = await components_service.findOne({ slug })
+    if (component_exist) {
         create_error(error, 'name', 'COMPONENT_ALREADY_EXIST')
     }
 
@@ -33,17 +28,9 @@ export default async (parent: undefined, args: ICreateComponentArgs) => {
         createdAt: new Date(),
     }
 
-    try {
-        const { database, client } = await connection()
-        const collection = database.collection('components', {})
-        const result = await collection.insertOne(component)
-        const inserted_record = await collection.findOne({
-            _id: result.insertedId,
-        })
-        client.close()
-        return inserted_record
-    } catch (e) {
-        create_error(error, 'name', 'UNKNOWN_ERROR')
-        throw new Error(JSON.stringify(error))
-    }
+    const result = await components_service.insertOne(component)
+    const created_component = await components_service.findById(
+        result.insertedId
+    )
+    return created_component
 }

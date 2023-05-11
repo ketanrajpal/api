@@ -18,7 +18,7 @@ export default async (
     args: ILoginArgs,
     context: IContext
 ) => {
-    const user_service = new Service<IUser>('users')
+    const users_service = new Service<IUser>('users')
     const error: IError[] = []
 
     const email = _email(args.email, true)
@@ -29,7 +29,7 @@ export default async (
 
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
-    const user = await user_service.findOne({ email: email.value })
+    const user = await users_service.findOne({ email: email.value })
 
     if (!user) {
         create_error(error, 'email', 'EMAIL_NOT_FOUND')

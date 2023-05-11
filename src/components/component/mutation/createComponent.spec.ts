@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
-import { connection } from '../../../utils/database'
+import Service from '@/utils/service'
 
 export const query = /* GraphQL */ `
     mutation CreateComponent($name: String!) {
@@ -22,10 +22,8 @@ describe('create component mutation', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
-        const { database, client } = await connection()
-        const collection = database.collection('components', {})
-        await collection.deleteMany({})
-        client.close()
+        const components_service = new Service('components')
+        components_service.deleteAll()
     })
 
     afterAll(() => {

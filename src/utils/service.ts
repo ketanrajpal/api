@@ -11,10 +11,10 @@ import {
 } from 'mongodb'
 import { connection } from './database'
 
-type CollectionName = 'users'
+type CollectionName = 'users' | 'components'
 
 export default class Service<T extends Document> {
-    private collectionName: CollectionName
+    protected collectionName: CollectionName
 
     constructor(collectionName: CollectionName) {
         this.collectionName = collectionName
@@ -79,5 +79,13 @@ export default class Service<T extends Document> {
         const result = await collection.find(filter).toArray()
         client.close()
         return result
+    }
+
+    /** delete all */
+    async deleteAll(): Promise<void> {
+        const { database, client } = await connection()
+        const collection = database.collection<T>(this.collectionName)
+        await collection.deleteMany({})
+        client.close()
     }
 }
