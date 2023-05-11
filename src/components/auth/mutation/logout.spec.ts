@@ -34,12 +34,12 @@ describe('me query', () => {
     })
 
     it('user unauthorised', async () => {
-        let response = await request.post('/graphql').trustLocalhost().send({
+        await request.post('/graphql').trustLocalhost().send({
             query: loginQuery,
             variables: loginVariable,
         })
 
-        response = await request.post('/graphql').trustLocalhost().send({
+        let response = await request.post('/graphql').trustLocalhost().send({
             query: meQuery,
         })
 

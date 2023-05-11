@@ -1,9 +1,8 @@
 import { IContext } from '../../../graphql/context'
 import { create_error, IError } from '../../../utils/error'
-
-import { connection } from '../../../utils/database'
 import { IUser } from '../../user/user'
 import { ObjectId } from 'mongodb'
+import Service from '@/utils/service'
 
 export default async (
     parent: undefined,
@@ -12,12 +11,8 @@ export default async (
 ) => {
     const error: IError[] = []
     if (context.user) {
-        const { database, client } = await connection()
-        const collection = database.collection('users', {})
-        const user = await collection.findOne<IUser>({
-            _id: new ObjectId(context.user._id),
-        })
-        client.close()
+        const user_service = new Service<IUser>('users')
+        const user = await user_service.findById(new ObjectId(context.user._id))
         return user
     } else {
         create_error(error, 'user', 'UNAUTHORIZED')

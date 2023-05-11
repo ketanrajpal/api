@@ -1,4 +1,3 @@
-import { connection } from '../../../utils/database'
 import {
     _alpha_with_spaces,
     _email,
@@ -8,15 +7,11 @@ import {
 import { create_error, IError } from '../../../utils/error'
 import { hash_password } from '../../../utils/bcrypt'
 
-interface ICreateUserArgs {
-    firstName: string
-    lastName: string
-    email: string
-    password: string
-    terms: boolean
-}
+import Services from '@/utils/service'
+import { IUser, IUserInput } from '../user'
 
-export default async (parent: undefined, args: ICreateUserArgs) => {
+export default async (parent: undefined, args: IUserInput) => {
+    const user_service = new Services<IUser>('users')
     const error: IError[] = []
 
     const first_name = _alpha_with_spaces(args.firstName, true)
@@ -29,10 +24,7 @@ export default async (parent: undefined, args: ICreateUserArgs) => {
     const email = _email(args.email, true)
     if (email.code !== null) create_error(error, 'email', email.code)
     else {
-        const { database, client } = await connection()
-        const collection = database.collection('users', {})
-        const user_exist = await collection.findOne({ email: email.value })
-        client.close()
+        const user_exist = await user_service.findOne({ email: email.value })
         if (user_exist) create_error(error, 'email', 'EMAIL_ALREADY_EXIST')
     }
 
@@ -46,7 +38,7 @@ export default async (parent: undefined, args: ICreateUserArgs) => {
 
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
-    const user = {
+    const user: IUser = {
         firstName: args.firstName,
         lastName: args.lastName,
         email: args.email,
@@ -58,17 +50,9 @@ export default async (parent: undefined, args: ICreateUserArgs) => {
     }
 
     try {
-        const { database, client } = await connection()
-        const collection = database.collection('users', {})
-        const result = await collection.insertOne(user)
-        const inserted_record = await collection.findOne(
-            { _id: result.insertedId },
-            { projection: { password: 0, salt: 0 } }
-        )
-
-        client.close()
-
-        return inserted_record
+        const result = await user_service.insertOne(user)
+        const created_user = await user_service.findById(result.insertedId)
+        return created_user
     } catch (e) {
         create_error(error, 'email', 'UNKNOWN_ERROR')
         throw new Error(JSON.stringify(error))

@@ -14,6 +14,9 @@ const error_codes: { [key: string]: string } = {
     EMAIL_NOT_FOUND: 'email address not found',
     FIELD_REQUIRED: 'missing required field {field}',
     INVALID_AUTH: 'email address and password do not match',
+    INVALID_CONTENT_TYPE: 'content type must be html or text',
+    INVALID_NOTIFICATION_TYPE: 'notification type must be mail, sms, or push',
+    NOTIFICATION_NOT_CREATED: 'notification not created',
     OBJECT_ID_INVALID: 'object id is invalid',
     PASSWORD_INVALID:
         'password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',

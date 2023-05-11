@@ -1,5 +1,6 @@
 import jwt, { Secret } from 'jsonwebtoken'
 import { IUser } from '../components/user/user'
+import { WithId } from 'mongodb'
 
 /** payload interface */
 export interface IPayload {
@@ -12,18 +13,18 @@ export interface IPayload {
 }
 
 /** create access token */
-export const create_access_token = (user: IUser) => {
+export const create_access_token = (user: WithId<IUser>) => {
     const access_token_secret = process.env.ACCESS_TOKEN_SECRET as Secret
     const access_token_expiration = process.env.ACCESS_TOKEN_EXPIRATION
     const issuer = process.env.ISSUER
 
     return jwt.sign(
         {
-            _id: user._id,
+            _id: user._id.toString(),
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            createdAt: user.createdAt,
+            createdAt: user.createdAt.toString(),
             lastLogin: user.lastLogin,
         } as IPayload,
         access_token_secret,
@@ -36,18 +37,18 @@ export const create_access_token = (user: IUser) => {
 }
 
 /** create refresh token */
-export const create_refresh_token = (user: IUser) => {
+export const create_refresh_token = (user: WithId<IUser>) => {
     const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET as Secret
     const refresh_token_expiration = process.env.REFRESH_TOKEN_EXPIRATION
     const issuer = process.env.ISSUER
 
     return jwt.sign(
         {
-            _id: user._id,
+            _id: user._id.toString(),
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            createdAt: user.createdAt,
+            createdAt: user.createdAt.toString(),
             lastLogin: user.lastLogin,
         } as IPayload,
         refresh_token_secret,

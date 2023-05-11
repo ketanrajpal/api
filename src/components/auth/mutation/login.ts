@@ -1,6 +1,4 @@
 import { IContext } from '../../../graphql/context'
-
-import { connection } from '../../../utils/database'
 import { create_error, IError } from '../../../utils/error'
 import { _email, _password } from '../../../utils/validator'
 import { compare_password } from '../../../utils/bcrypt'
@@ -8,6 +6,7 @@ import { create_access_token, create_refresh_token } from '../../../utils/jwt'
 
 import { create_secure_cookie } from '../../../utils/cookie'
 import { IUser } from '../../user/user'
+import Service from '@/utils/service'
 
 interface ILoginArgs {
     email: string
@@ -19,6 +18,7 @@ export default async (
     args: ILoginArgs,
     context: IContext
 ) => {
+    const user_service = new Service<IUser>('users')
     const error: IError[] = []
 
     const email = _email(args.email, true)
@@ -29,10 +29,7 @@ export default async (
 
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
-    const { database, client } = await connection()
-    const collection = database.collection('users', {})
-    const user = await collection.findOne<IUser>({ email: email.value })
-    client.close()
+    const user = await user_service.findOne({ email: email.value })
 
     if (!user) {
         create_error(error, 'email', 'EMAIL_NOT_FOUND')

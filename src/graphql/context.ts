@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
 import { verify_access_token } from '../utils/jwt'
-import { connection } from '../utils/database'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { IUser } from '../components/user/user'
+import Service from '@/utils/service'
 
 export interface IContext {
     request: Request
     response: Response
-    user: IUser | null
+    user: WithId<IUser> | null
 }
 
 export default async ({ req, res }: { req: Request; res: Response }) => {
-    let user: IUser | null = null
+    let user: WithId<IUser> | null = null
 
     if ('accessToken' in req.cookies) {
         let payload = null
@@ -22,15 +22,9 @@ export default async ({ req, res }: { req: Request; res: Response }) => {
         }
 
         if (payload) {
-            const { database, client } = await connection()
-            const collection = database.collection('users', {})
-            user = await collection.findOne<IUser>({
-                _id: new ObjectId(payload._id),
-                email: payload.email,
-                createdAt: new Date(payload.createdAt),
-            })
-            client.close()
-        } else user = null
+            const user_service = new Service<IUser>('users')
+            user = await user_service.findById(new ObjectId(payload._id))
+        }
     }
 
     return { request: req, response: res, user }
