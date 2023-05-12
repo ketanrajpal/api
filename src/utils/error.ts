@@ -8,6 +8,8 @@ export interface IError {
 const error_codes: { [key: string]: string } = {
     ALPHA_WITH_SPACES_INVALID:
         'field {field} must contain only letters and spaces',
+    ALPHA_WITH_SPACES_AND_NUMBERS_INVALID:
+        'field {field} must contain only letters, spaces, and numbers',
     COMPONENT_ALREADY_EXIST: 'component name already exists',
     EMAIL_ALREADY_EXIST: 'email address already exists',
     EMAIL_INVALID: 'email address is invalid',

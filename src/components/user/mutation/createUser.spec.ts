@@ -48,9 +48,7 @@ describe('create user mutation', () => {
         client.close()
     })
 
-    afterAll(() => {
-        server.close()
-    })
+    afterAll(() => server.close())
 
     it('empty first name', async () => {
         const response = await request

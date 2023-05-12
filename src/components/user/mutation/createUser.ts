@@ -3,12 +3,11 @@ import {
     _email,
     _password,
     _boolean,
-} from '../../../utils/validator'
-import { create_error, IError } from '../../../utils/error'
-import { hash_password } from '../../../utils/bcrypt'
-
+} from '@/utils/validator'
+import { create_error, IError } from '@/utils/error'
+import { hash_password } from '@/utils/bcrypt'
 import Services from '@/utils/service'
-import { IUser, IUserInput } from '../user'
+import { IUser, IUserInput } from '@/components/user/user'
 
 export default async (parent: undefined, args: IUserInput) => {
     const users_service = new Services<IUser>('users')

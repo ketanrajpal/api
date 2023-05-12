@@ -1,60 +1,52 @@
-import { connection } from '../../../utils/database'
+import Service from '@/utils/service'
 import { create_error, IError } from '../../../utils/error'
 import {
     _object_id,
     _alpha_with_spaces_and_numbers,
     escape,
+    _alpha,
 } from '../../../utils/validator'
+import { IUser } from '@/components/user/user'
+import { IComponent } from '@/components/component/component'
+import { INotification, INotificationInput } from '../notification'
+import { ObjectId } from 'mongodb'
 
-interface ICreateNotificationArgs {
-    user: string
-    component: string
-    contentType: 'html' | 'text'
-    type: 'mail' | 'sms' | 'push'
-    title: string
-    message: string
-}
-
-export default async (parent: undefined, args: ICreateNotificationArgs) => {
+export default async (parent: undefined, args: INotificationInput) => {
     const error: IError[] = []
-    const { database, client } = await connection()
+
+    const users_service = new Service<IUser>('users')
+    const components_service = new Service<IComponent>('components')
+    const notifications_service = new Service<INotification>('notifications')
 
     const user = _object_id(args.user, true)
     if (user.code !== null) create_error(error, 'user', user.code)
     else {
-        try {
-            const collection = database.collection('users', {})
-            const user_exist = await collection.findOne({
-                _id: user.value,
-            })
-            if (!user_exist) create_error(error, 'user', 'USER_NOT_FOUND')
-        } catch (e) {
-            create_error(error, 'user', 'USER_NOT_FOUND')
-        }
+        const user_exist = await users_service.findById(
+            new ObjectId(user.value)
+        )
+        if (!user_exist) create_error(error, 'user', 'USER_NOT_FOUND')
     }
 
     const component = _object_id(args.component, true)
     if (component.code !== null)
         create_error(error, 'component', component.code)
     else {
-        try {
-            const collection = database.collection('components', {})
-            const component_exist = await collection.findOne({
-                _id: component.value,
-            })
-            if (!component_exist)
-                create_error(error, 'component', 'COMPONENT_NOT_FOUND')
-        } catch (e) {
+        const component_exist = await components_service.findById(
+            new ObjectId(component.value)
+        )
+        if (!component_exist)
             create_error(error, 'component', 'COMPONENT_NOT_FOUND')
-        }
     }
 
-    client.close()
-
-    if (args.contentType !== 'html' && args.contentType !== 'text')
+    const contentType = _alpha(args.contentType, true)
+    if (contentType.code !== null)
+        create_error(error, 'contentType', contentType.code)
+    else if (!['html', 'text'].includes(args.contentType))
         create_error(error, 'contentType', 'INVALID_CONTENT_TYPE')
 
-    if (args.type !== 'mail' && args.type !== 'sms' && args.type !== 'push')
+    const type = _alpha(args.type, true)
+    if (type.code !== null) create_error(error, 'type', type.code)
+    else if (!['mail', 'sms', 'push'].includes(args.type))
         create_error(error, 'type', 'INVALID_NOTIFICATION_TYPE')
 
     const title = _alpha_with_spaces_and_numbers(args.title, true)
@@ -64,9 +56,9 @@ export default async (parent: undefined, args: ICreateNotificationArgs) => {
 
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
-    const notification = {
-        user: user.value,
-        component: component.value,
+    const notification: INotification = {
+        user: new ObjectId(user.value),
+        component: new ObjectId(component.value),
         contentType: args.contentType,
         type: args.type,
         title: title.value,
@@ -74,17 +66,9 @@ export default async (parent: undefined, args: ICreateNotificationArgs) => {
         createdAt: new Date(),
     }
 
-    try {
-        const { database, client } = await connection()
-        const collection = database.collection('notifications', {})
-        const result = await collection.insertOne(notification)
-        const inserted_record = await collection.findOne({
-            _id: result.insertedId,
-        })
-        client.close()
-        return inserted_record
-    } catch (e) {
-        create_error(error, 'notification', 'NOTIFICATION_NOT_CREATED')
-        throw new Error(JSON.stringify(error))
-    }
+    const result = await notifications_service.insertOne(notification)
+    const created_notification = await notifications_service.findById(
+        result.insertedId
+    )
+    return created_notification
 }

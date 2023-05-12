@@ -11,7 +11,7 @@ import {
 } from 'mongodb'
 import { connection } from './database'
 
-type CollectionName = 'users' | 'components'
+type CollectionName = 'users' | 'components' | 'notifications'
 
 export default class Service<T extends Document> {
     protected collectionName: CollectionName

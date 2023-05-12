@@ -1,13 +1,11 @@
 import Service from '@/utils/service'
 import { create_error, IError } from '../../../utils/error'
 import { _alpha_with_spaces, _slug } from '../../../utils/validator'
-interface ICreateComponentArgs {
-    name: string
-}
+import { IComponent, IComponentInput } from '../component'
 
-export default async (parent: undefined, args: ICreateComponentArgs) => {
+export default async (parent: undefined, args: IComponentInput) => {
     const error: IError[] = []
-    const components_service = new Service('components')
+    const components_service = new Service<IComponent>('components')
 
     const name = _alpha_with_spaces(args.name, true)
     if (name.code !== null) create_error(error, 'name', name.code)
@@ -22,7 +20,7 @@ export default async (parent: undefined, args: ICreateComponentArgs) => {
 
     if (error.length > 0) throw new Error(JSON.stringify(error))
 
-    const component = {
+    const component: IComponent = {
         name: args.name,
         slug,
         createdAt: new Date(),

@@ -9,6 +9,7 @@ import {
     variable as loginVariable,
 } from '../mutation/login.spec'
 import Service from '@/utils/service'
+import { IUser } from '@/components/user/user'
 
 export const query = /* GraphQL */ `
     query Query {
@@ -30,7 +31,7 @@ describe('logout mutation', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
-        const users_service = new Service('users')
+        const users_service = new Service<IUser>('users')
         users_service.deleteAll()
 
         await request.post('/graphql').trustLocalhost().send({
@@ -39,9 +40,7 @@ describe('logout mutation', () => {
         })
     })
 
-    afterAll(() => {
-        server.close()
-    })
+    afterAll(() => server.close())
 
     it('user unauthorised', async () => {
         const response = await request.post('/graphql').trustLocalhost().send({

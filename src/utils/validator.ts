@@ -101,12 +101,12 @@ export const _password = (
 export const _object_id = (
     id: string,
     required: boolean
-): { code: string | null; value: ObjectId } => {
+): { code: string | null; value: string } => {
     let code: string | null = null
     id = escape(id)
     if (required && id.length === 0) code = 'FIELD_REQUIRED'
     if (id.length > 0 && !validator.isMongoId(id)) code = 'OBJECT_ID_INVALID'
-    return { code, value: new ObjectId(id) }
+    return { code, value: id }
 }
 
 /** create slug */
