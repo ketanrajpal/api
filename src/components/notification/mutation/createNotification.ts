@@ -62,7 +62,7 @@ export default async (parent: undefined, args: INotificationInput) => {
         contentType: args.contentType,
         type: args.type,
         title: title.value,
-        message: message,
+        message,
         createdAt: new Date(),
     }
 

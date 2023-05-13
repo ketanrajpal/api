@@ -1,6 +1,6 @@
 {
     "jest.showCoverageOnLoad": true,
-    "jest.jestCommandLine": "NODE_ENV=test node_modules/.bin/jest --coverage --config jest.config.ts --runInBand",
+    "jest.jestCommandLine": "NODE_ENV=test node_modules/.bin/jest --coverage --config jest.config.ts --runInBand --coverage",
     "sonarlint.connectedMode.project": {
         "connectionId": "ketanrajpal",
         "projectKey": "ketanrajpal_api"

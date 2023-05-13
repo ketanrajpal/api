@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb'
 import validator from 'validator'
 
 /** escape string validator */

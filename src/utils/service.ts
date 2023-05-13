@@ -9,10 +9,11 @@ import {
     Document,
     MatchKeysAndValues,
 } from 'mongodb'
-import { connection } from './database'
+import { connection } from '@/utils/database'
 
 type CollectionName = 'users' | 'components' | 'notifications'
 
+/** database service class */
 export default class Service<T extends Document> {
     protected collectionName: CollectionName
 

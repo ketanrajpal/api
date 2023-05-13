@@ -10,6 +10,7 @@ import fs from 'fs'
 import cors from 'cors'
 import graphqlServer from './graphql/server'
 import context from './graphql/context'
+import path from 'path'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
@@ -31,8 +32,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 export const server = createServer(
     {
-        key: fs.readFileSync(`${__dirname}/certs/localhost.key`),
-        cert: fs.readFileSync(`${__dirname}/certs/localhost.crt`),
+        key: fs.readFileSync(path.join(__dirname, 'certs', 'localhost.key')),
+        cert: fs.readFileSync(path.join(__dirname, 'certs', 'localhost.crt')),
     },
     app
 ).listen({ port: process.env.PORT })

@@ -22,7 +22,10 @@ export const variable = {
 describe('create component mutation', () => {
     const request = supertest.agent(server)
 
-    beforeAll(async () => new Service<IComponent>('components').deleteAll())
+    beforeAll(async () => {
+        await new Service<IComponent>('components').deleteAll()
+    })
+
     afterAll(() => server.close())
 
     it('empty name', async () => {

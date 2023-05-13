@@ -27,7 +27,16 @@ describe('update component mutation', () => {
     }
 
     beforeAll(async () => {
-        new Service<IComponent>('components').deleteAll()
+        await new Service<IComponent>('components').deleteAll()
+        await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send({
+                query: create_component_query,
+                variables: {
+                    name: 'Auth',
+                },
+            })
         const component = await request
             .post('/graphql')
             .trustLocalhost()
@@ -37,6 +46,7 @@ describe('update component mutation', () => {
                     ...create_component_variable,
                 },
             })
+
         variable._id = component.body.data.createComponent._id.toString()
     })
 
@@ -123,7 +133,6 @@ describe('update component mutation', () => {
                 },
             })
 
-        console.log(response)
         const data = response.body.data.updateComponent
         expect(data).toHaveProperty('_id')
         expect(data).toHaveProperty('name', variable.name)
@@ -131,5 +140,23 @@ describe('update component mutation', () => {
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
         expect(response.body).not.toHaveProperty('errors')
+    })
+
+    it('component already exist', async () => {
+        const response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send({
+                query,
+                variables: {
+                    ...variable,
+                    name: 'Auth',
+                },
+            })
+
+        const errors = response.body.errors[0].message
+        expect(errors).toBeInstanceOf(Array)
+        expect(errors[0].code).toBe('COMPONENT_ALREADY_EXIST')
+        expect(errors[0].field).toBe('name')
     })
 })

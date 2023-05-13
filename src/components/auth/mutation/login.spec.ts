@@ -32,8 +32,7 @@ describe('login mutation', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
-        const users_service = new Service<IUser>('users')
-        await users_service.deleteAll()
+        await new Service<IUser>('users').deleteAll()
 
         await request.post('/graphql').trustLocalhost().send({
             query: createUserQuery,

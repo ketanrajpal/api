@@ -38,8 +38,6 @@ export default async (parent: undefined, args: IComponentUpdateInput) => {
         updatedAt: new Date(),
     }
 
-    console.log(_id.value, component)
-
     await components_service.updateById(new ObjectId(_id.value), component)
     const updated_component = await components_service.findById(
         new ObjectId(_id.value)
