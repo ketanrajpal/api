@@ -6,8 +6,8 @@ import {
     Filter,
     WithId,
     UpdateResult,
-    UpdateFilter,
     Document,
+    MatchKeysAndValues,
 } from 'mongodb'
 import { connection } from './database'
 
@@ -45,11 +45,13 @@ export default class Service<T extends Document> {
     /** update one */
     async updateById(
         _id: ObjectId,
-        data: UpdateFilter<T>
+        data: MatchKeysAndValues<T>
     ): Promise<UpdateResult<T>> {
         const { database, client } = await connection()
         const collection = database.collection<T>(this.collectionName)
-        const result = await collection.updateOne({ _id } as Filter<T>, data)
+        const result = await collection.updateOne({ _id } as Filter<T>, {
+            $set: data,
+        })
         client.close()
         return result
     }

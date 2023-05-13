@@ -12,7 +12,6 @@ export default {
     },
     Notification: {
         user: async ({ user }: { user: ObjectId }) => {
-            console.log(user)
             const { database, client } = await connection()
             const collection = database.collection('users', {})
             const user_exist = await collection.findOne({ _id: user })

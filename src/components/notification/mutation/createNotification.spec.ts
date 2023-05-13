@@ -7,8 +7,8 @@ import {
     query as user_query,
 } from '@/components/user/mutation/createUser.spec'
 import {
-    variable as component_variable,
-    query as component_query,
+    variable as create_component_variable,
+    query as create_component_query,
 } from '@/components/component/mutation/createComponent.spec'
 import { IComponent } from '@/components/component/component'
 import { IUser } from '@/components/user/user'
@@ -90,9 +90,9 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: component_query,
+                query: create_component_query,
                 variables: {
-                    ...component_variable,
+                    ...create_component_variable,
                 },
             })
         variable.component = component.body.data.createComponent._id.toString()
@@ -193,7 +193,7 @@ describe('create notification mutation', () => {
                 query,
                 variables: {
                     ...variable,
-                    title: 'aghdafs#$%^&*',
+                    title: '#invalid$%^title',
                 },
             })
         const errors = response.body.errors[0].message

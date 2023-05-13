@@ -14,7 +14,7 @@ export default gql`
         components: [Component!]!
 
         "get component by id"
-        component(id: ID!): Component!
+        component(_id: ID!): Component!
     }
 
     extend type Mutation {
@@ -22,9 +22,14 @@ export default gql`
         createComponent(name: String!): Component!
 
         "update component by id"
-        updateComponent(id: ID!, name: String!): Component!
+        updateComponent(_id: ID!, name: String!): Component!
 
         "delete component by id"
-        deleteComponent(id: ID!): Component!
+        deleteComponent(_id: ID!): Component!
+    }
+
+    extend type Subscription {
+        "subscribe to component created event"
+        componentCreated: Component!
     }
 `

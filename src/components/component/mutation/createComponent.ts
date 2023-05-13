@@ -1,9 +1,10 @@
 import Service from '@/utils/service'
 import { create_error, IError } from '../../../utils/error'
 import { _alpha_with_spaces, _slug } from '../../../utils/validator'
-import { IComponent, IComponentInput } from '../component'
+import { IComponent, IComponentCreateInput } from '../component'
+import { pubsub } from '@/graphql/subscription'
 
-export default async (parent: undefined, args: IComponentInput) => {
+export default async (parent: undefined, args: IComponentCreateInput) => {
     const error: IError[] = []
     const components_service = new Service<IComponent>('components')
 
@@ -30,5 +31,6 @@ export default async (parent: undefined, args: IComponentInput) => {
     const created_component = await components_service.findById(
         result.insertedId
     )
+    pubsub.publish('componentCreated', { componentCreated: created_component })
     return created_component
 }

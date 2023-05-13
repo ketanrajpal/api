@@ -1,10 +1,15 @@
 export interface IComponent {
     name: string
     slug: string
-    createdAt: Date
+    createdAt?: Date
     updatedAt?: Date
 }
 
-export interface IComponentInput {
+export interface IComponentCreateInput {
+    name: string
+}
+
+export interface IComponentUpdateInput {
+    _id: string
     name: string
 }
