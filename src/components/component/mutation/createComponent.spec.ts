@@ -2,22 +2,7 @@ import supertest from 'supertest'
 import { server } from '../../../index'
 import Service from '@/utils/service'
 import { IComponent } from '../component'
-
-export const query = /* GraphQL */ `
-    mutation CreateComponent($name: String!) {
-        createComponent(name: $name) {
-            _id
-            name
-            slug
-            createdAt
-            updatedAt
-        }
-    }
-`
-
-export const variable = {
-    name: 'Component',
-}
+import { createComponent } from '../variables'
 
 describe('create component mutation', () => {
     const request = supertest.agent(server)
@@ -33,7 +18,7 @@ describe('create component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createComponent.query,
                 variables: {
                     name: '',
                 },
@@ -50,7 +35,7 @@ describe('create component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createComponent.query,
                 variables: {
                     name: 'invalid46578',
                 },
@@ -66,16 +51,11 @@ describe('create component mutation', () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                },
-            })
+            .send(createComponent)
 
         const data = response.body.data.createComponent
         expect(data).toHaveProperty('_id')
-        expect(data).toHaveProperty('name', variable.name)
+        expect(data).toHaveProperty('name', createComponent.variables.name)
         expect(data).toHaveProperty('slug')
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
@@ -86,12 +66,7 @@ describe('create component mutation', () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
-            .send({
-                query,
-                variables: {
-                    ...variable,
-                },
-            })
+            .send(createComponent)
 
         const errors = response.body.errors[0].message
         expect(errors).toBeInstanceOf(Array)

@@ -12,6 +12,8 @@ import graphqlServer from './graphql/server'
 import context from './graphql/context'
 import path from 'path'
 
+import CsrfRouter from './router/csrf'
+
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
 const app = express()
@@ -29,6 +31,8 @@ app.use(
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use('/csrf', CsrfRouter)
 
 export const server = createServer(
     {

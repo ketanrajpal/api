@@ -2,61 +2,11 @@ import supertest from 'supertest'
 import { server } from '@/index'
 import Service from '@/utils/service'
 import { INotification } from '@/components/notification/notification'
-import {
-    variable as user_variable,
-    query as user_query,
-} from '@/components/user/mutation/createUser.spec'
-import {
-    variable as create_component_variable,
-    query as create_component_query,
-} from '@/components/component/mutation/createComponent.spec'
 import { IComponent } from '@/components/component/component'
 import { IUser } from '@/components/user/user'
-
-export const query = /* GraphQL */ `
-    mutation Mutation(
-        $user: ID!
-        $component: String!
-        $type: NotificationType!
-        $title: String!
-        $message: String!
-        $contentType: ContentType
-    ) {
-        createNotification(
-            user: $user
-            component: $component
-            type: $type
-            title: $title
-            message: $message
-            contentType: $contentType
-        ) {
-            _id
-            user {
-                _id
-                firstName
-                lastName
-                email
-                terms
-                createdAt
-                updatedAt
-                lastLogin
-                active
-            }
-            component {
-                _id
-                name
-                slug
-                createdAt
-                updatedAt
-            }
-            contentType
-            type
-            title
-            message
-            createdAt
-        }
-    }
-`
+import { createUserMutation } from '@/components/user/variables'
+import { createComponent } from '@/components/component/variables'
+import { createNotification } from '../variables'
 
 describe('create notification mutation', () => {
     const request = supertest.agent(server)
@@ -78,34 +28,24 @@ describe('create notification mutation', () => {
         const user = await request
             .post('/graphql')
             .trustLocalhost()
-            .send({
-                query: user_query,
-                variables: {
-                    ...user_variable,
-                },
-            })
+            .send(createUserMutation)
         variable.user = user.body.data.createUser._id.toString()
 
         const component = await request
             .post('/graphql')
             .trustLocalhost()
-            .send({
-                query: create_component_query,
-                variables: {
-                    ...create_component_variable,
-                },
-            })
+            .send(createComponent)
         variable.component = component.body.data.createComponent._id.toString()
     })
 
     afterAll(() => server.close())
 
-    it('empty user', async () => {
+    test('empty user', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     user: '',
@@ -117,12 +57,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('user')
     })
 
-    it('invalid user', async () => {
+    test('invalid user', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     user: 'invalid',
@@ -134,12 +74,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('user')
     })
 
-    it('empty component', async () => {
+    test('empty component', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     component: '',
@@ -151,12 +91,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('component')
     })
 
-    it('invalid component', async () => {
+    test('invalid component', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     component: 'invalid',
@@ -168,12 +108,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('component')
     })
 
-    it('empty title', async () => {
+    test('empty title', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     title: '',
@@ -185,12 +125,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('title')
     })
 
-    it('invalid title', async () => {
+    test('invalid title', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                     title: '#invalid$%^title',
@@ -202,12 +142,12 @@ describe('create notification mutation', () => {
         expect(errors[0].field).toBe('title')
     })
 
-    it('valid notification', async () => {
+    test('valid notification', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createNotification.query,
                 variables: {
                     ...variable,
                 },

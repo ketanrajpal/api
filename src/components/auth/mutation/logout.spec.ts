@@ -1,66 +1,56 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
-import {
-    query as createUserQuery,
-    variable as createUserVariable,
-} from '../../user/mutation/createUser.spec'
-import { query as loginQuery, variable as loginVariable } from './login.spec'
-import { query as meQuery } from '../query/me.spec'
 import Service from '@/utils/service'
 import { IUser } from '@/components/user/user'
+import { createUserMutation } from '@/components/user/variables'
+import { loginMutation, logoutMutation, meQuery } from '../variables'
 
-const query = /* GraphQL */ `
-    mutation Logout {
-        logout
-    }
-`
-
-describe('me query', () => {
+describe('logout mutation', () => {
     const request = supertest.agent(server)
 
     beforeAll(async () => {
         await new Service<IUser>('users').deleteAll()
 
-        await request.post('/graphql').trustLocalhost().send({
-            query: createUserQuery,
-            variables: createUserVariable,
-        })
+        await request.post('/graphql').trustLocalhost().send(createUserMutation)
     })
 
     afterAll(() => server.close())
 
     it('user unauthorised', async () => {
-        await request.post('/graphql').trustLocalhost().send({
-            query: loginQuery,
-            variables: loginVariable,
-        })
+        await request.post('/graphql').trustLocalhost().send(loginMutation)
 
-        let response = await request.post('/graphql').trustLocalhost().send({
-            query: meQuery,
-        })
+        let response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send(meQuery)
 
         let data = response.body.data.me
         expect(data).toHaveProperty('_id')
-        expect(data).toHaveProperty('firstName', createUserVariable.firstName)
-        expect(data).toHaveProperty('lastName', createUserVariable.lastName)
-        expect(data).toHaveProperty('email', createUserVariable.email)
-        expect(data).toHaveProperty('terms', createUserVariable.terms)
+        expect(data).toHaveProperty(
+            'firstName',
+            createUserMutation.variables.firstName
+        )
+        expect(data).toHaveProperty(
+            'lastName',
+            createUserMutation.variables.lastName
+        )
+        expect(data).toHaveProperty('email', createUserMutation.variables.email)
+        expect(data).toHaveProperty('terms', createUserMutation.variables.terms)
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
         expect(data).toHaveProperty('lastLogin')
         expect(data).toHaveProperty('active', true)
         expect(response.body).not.toHaveProperty('errors')
 
-        response = await request.post('/graphql').trustLocalhost().send({
-            query,
-        })
+        response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send(logoutMutation)
 
         data = response.body.data.logout
         expect(data).toBe(true)
 
-        response = await request.post('/graphql').trustLocalhost().send({
-            query: meQuery,
-        })
+        response = await request.post('/graphql').trustLocalhost().send(meQuery)
 
         const errors = response.body.errors[0].message
         expect(errors).toBeInstanceOf(Array)

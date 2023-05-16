@@ -1,32 +1,10 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
-import {
-    query as createUserQuery,
-    variable as createUserVariable,
-} from '../../user/mutation/createUser.spec'
+
 import Service from '@/utils/service'
 import { IUser } from '@/components/user/user'
-
-export const query = /* GraphQL */ `
-    mutation Login($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-            _id
-            firstName
-            lastName
-            email
-            terms
-            createdAt
-            updatedAt
-            lastLogin
-            active
-        }
-    }
-`
-
-export const variable = {
-    email: 'john.doe@mail.com',
-    password: 'Password@123!',
-}
+import { loginMutation } from '../variables'
+import { createUserMutation } from '@/components/user/variables'
 
 describe('login mutation', () => {
     const request = supertest.agent(server)
@@ -34,10 +12,7 @@ describe('login mutation', () => {
     beforeAll(async () => {
         await new Service<IUser>('users').deleteAll()
 
-        await request.post('/graphql').trustLocalhost().send({
-            query: createUserQuery,
-            variables: createUserVariable,
-        })
+        await request.post('/graphql').trustLocalhost().send(createUserMutation)
     })
 
     afterAll(() => server.close())
@@ -47,9 +22,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     email: '',
                 },
             })
@@ -66,9 +41,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     email: 'john.doe@mail',
                 },
             })
@@ -85,9 +60,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     email: 'noemail@account.com',
                 },
             })
@@ -104,9 +79,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     password: '',
                 },
             })
@@ -123,9 +98,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     password: 'password',
                 },
             })
@@ -142,9 +117,9 @@ describe('login mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: loginMutation.query,
                 variables: {
-                    ...variable,
+                    ...loginMutation.variables,
                     password: 'Wrong@Password@123!',
                 },
             })
@@ -157,10 +132,10 @@ describe('login mutation', () => {
     })
 
     it('valid login', async () => {
-        const response = await request.post('/graphql').trustLocalhost().send({
-            query,
-            variables: variable,
-        })
+        const response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send(loginMutation)
 
         const cookies: string[] = []
         response
@@ -172,10 +147,16 @@ describe('login mutation', () => {
 
         const data = response.body.data.login
         expect(data).toHaveProperty('_id')
-        expect(data).toHaveProperty('firstName', createUserVariable.firstName)
-        expect(data).toHaveProperty('lastName', createUserVariable.lastName)
-        expect(data).toHaveProperty('email', createUserVariable.email)
-        expect(data).toHaveProperty('terms', createUserVariable.terms)
+        expect(data).toHaveProperty(
+            'firstName',
+            createUserMutation.variables.firstName
+        )
+        expect(data).toHaveProperty(
+            'lastName',
+            createUserMutation.variables.lastName
+        )
+        expect(data).toHaveProperty('email', createUserMutation.variables.email)
+        expect(data).toHaveProperty('terms', createUserMutation.variables.terms)
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
         expect(data).toHaveProperty('lastLogin')

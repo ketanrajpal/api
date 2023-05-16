@@ -2,22 +2,8 @@ import supertest from 'supertest'
 import { server } from '@/index'
 import Service from '@/utils/service'
 import { IComponent } from '../component'
-import {
-    variable as create_component_variable,
-    query as create_component_query,
-} from '@/components/component/mutation/createComponent.spec'
 
-export const query = /* GraphQL */ `
-    mutation UpdateComponent($_id: ID!, $name: String!) {
-        updateComponent(_id: $_id, name: $name) {
-            _id
-            name
-            slug
-            createdAt
-            updatedAt
-        }
-    }
-`
+import { createComponent, updateComponent } from '../variables'
 
 describe('update component mutation', () => {
     const request = supertest.agent(server)
@@ -32,20 +18,13 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: create_component_query,
-                variables: {
-                    name: 'Auth',
-                },
+                query: createComponent.query,
+                variables: { ...createComponent.variables, name: 'Auth' },
             })
         const component = await request
             .post('/graphql')
             .trustLocalhost()
-            .send({
-                query: create_component_query,
-                variables: {
-                    ...create_component_variable,
-                },
-            })
+            .send(createComponent)
 
         variable._id = component.body.data.createComponent._id.toString()
     })
@@ -57,7 +36,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                     name: '',
@@ -75,7 +54,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                     name: 'invalid46578',
@@ -93,7 +72,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                     _id: '',
@@ -110,7 +89,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                     _id: 'invalid',
@@ -127,7 +106,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                 },
@@ -147,7 +126,7 @@ describe('update component mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: updateComponent.query,
                 variables: {
                     ...variable,
                     name: 'Auth',

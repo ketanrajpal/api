@@ -11,6 +11,7 @@ const error_codes: { [key: string]: string } = {
     ALPHA_WITH_SPACES_AND_NUMBERS_INVALID:
         'field {field} must contain only letters, spaces, and numbers',
     COMPONENT_ALREADY_EXIST: 'component name already exists',
+    CSRF_TOKEN_INVALID: 'csrf token is invalid',
     EMAIL_ALREADY_EXIST: 'email address already exists',
     EMAIL_INVALID: 'email address is invalid',
     EMAIL_NOT_FOUND: 'email address not found',

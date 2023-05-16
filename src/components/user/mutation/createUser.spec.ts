@@ -1,42 +1,7 @@
 import supertest from 'supertest'
 import { server } from '../../../index'
 import { connection } from '../../../utils/database'
-
-export const query = /* GraphQL */ `
-    mutation CreateUser(
-        $firstName: String!
-        $lastName: String!
-        $email: String!
-        $password: String!
-        $terms: Boolean!
-    ) {
-        createUser(
-            firstName: $firstName
-            lastName: $lastName
-            email: $email
-            password: $password
-            terms: $terms
-        ) {
-            _id
-            firstName
-            lastName
-            email
-            terms
-            createdAt
-            updatedAt
-            lastLogin
-            active
-        }
-    }
-`
-
-export const variable = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@mail.com',
-    password: 'Password@123!',
-    terms: true,
-}
+import { createUserMutation } from '../variables'
 
 describe('create user mutation', () => {
     const request = supertest.agent(server)
@@ -51,13 +16,14 @@ describe('create user mutation', () => {
     afterAll(() => server.close())
 
     it('empty first name', async () => {
+        await request.get('/csrf').trustLocalhost().send()
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     firstName: '',
                 },
             })
@@ -73,9 +39,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     firstName: 'John123',
                 },
             })
@@ -92,9 +58,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     lastName: '',
                 },
             })
@@ -111,9 +77,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     lastName: 'Doe123',
                 },
             })
@@ -130,9 +96,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     email: '',
                 },
             })
@@ -149,9 +115,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     email: 'john.doe@mail',
                 },
             })
@@ -168,9 +134,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     password: '',
                 },
             })
@@ -187,9 +153,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     password: 'password',
                 },
             })
@@ -206,9 +172,9 @@ describe('create user mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query,
+                query: createUserMutation.query,
                 variables: {
-                    ...variable,
+                    ...createUserMutation.variables,
                     terms: false,
                 },
             })
@@ -221,17 +187,23 @@ describe('create user mutation', () => {
     })
 
     it('valid user', async () => {
-        const response = await request.post('/graphql').trustLocalhost().send({
-            query,
-            variables: variable,
-        })
+        const response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send(createUserMutation)
 
         const data = response.body.data.createUser
         expect(data).toHaveProperty('_id')
-        expect(data).toHaveProperty('firstName', variable.firstName)
-        expect(data).toHaveProperty('lastName', variable.lastName)
-        expect(data).toHaveProperty('email', variable.email)
-        expect(data).toHaveProperty('terms', variable.terms)
+        expect(data).toHaveProperty(
+            'firstName',
+            createUserMutation.variables.firstName
+        )
+        expect(data).toHaveProperty(
+            'lastName',
+            createUserMutation.variables.lastName
+        )
+        expect(data).toHaveProperty('email', createUserMutation.variables.email)
+        expect(data).toHaveProperty('terms', createUserMutation.variables.terms)
         expect(data).toHaveProperty('createdAt')
         expect(data).toHaveProperty('updatedAt')
         expect(data).toHaveProperty('lastLogin')
@@ -240,10 +212,10 @@ describe('create user mutation', () => {
     })
 
     it('duplicate user email', async () => {
-        const response = await request.post('/graphql').trustLocalhost().send({
-            query,
-            variables: variable,
-        })
+        const response = await request
+            .post('/graphql')
+            .trustLocalhost()
+            .send(createUserMutation)
 
         const errors = response.body.errors[0].message
         expect(errors).toBeInstanceOf(Array)

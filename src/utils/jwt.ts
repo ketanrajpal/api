@@ -12,6 +12,11 @@ export interface IPayload {
     lastLogin: string
 }
 
+/** csrf payload interface */
+export interface ICsrfPayload {
+    request_url: string
+}
+
 /** create access token */
 export const create_access_token = (user: WithId<IUser>) => {
     const access_token_secret = process.env.ACCESS_TOKEN_SECRET as Secret
@@ -60,6 +65,25 @@ export const create_refresh_token = (user: WithId<IUser>) => {
     )
 }
 
+/** create csrf token */
+export const create_csrf_token = (request_url: string) => {
+    const csrf_token_secret = process.env.CSRF_TOKEN_SECRET as Secret
+    const csrf_token_expiration = process.env.CSRF_TOKEN_EXPIRATION
+    const issuer = process.env.ISSUER
+
+    return jwt.sign(
+        {
+            request_url,
+        } as ICsrfPayload,
+        csrf_token_secret,
+        {
+            expiresIn: csrf_token_expiration,
+            subject: 'csrf token',
+            issuer,
+        }
+    )
+}
+
 /** verify access token */
 export const verify_access_token = (token: string) => {
     const access_token_secret = process.env.ACCESS_TOKEN_SECRET as Secret
@@ -78,4 +102,20 @@ export const verify_refresh_token = (token: string) => {
     return jwt.verify(token, refresh_token_secret, {
         issuer,
     }) as IPayload
+}
+
+/** verify csrf token */
+export const verify_csrf_token = (token: string, request_url: string) => {
+    const csrf_token_secret = process.env.CSRF_TOKEN_SECRET as Secret
+    const issuer = process.env.ISSUER
+
+    const verification = jwt.verify(token, csrf_token_secret, {
+        issuer,
+    }) as ICsrfPayload
+
+    if (verification && verification.request_url === request_url) {
+        return true
+    }
+
+    return false
 }
