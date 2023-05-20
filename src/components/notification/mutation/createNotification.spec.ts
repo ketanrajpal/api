@@ -5,8 +5,8 @@ import { INotification } from '@/components/notification/notification'
 import { IComponent } from '@/components/component/component'
 import { IUser } from '@/components/user/user'
 import { createUserMutation } from '@/components/user/variables'
-import { createComponent } from '@/components/component/variables'
-import { createNotification } from '../variables'
+import { createComponentMutation } from '@/components/component/variables'
+import { createNotificationMutation } from '../variables'
 
 describe('create notification mutation', () => {
     const request = supertest.agent(server)
@@ -34,18 +34,23 @@ describe('create notification mutation', () => {
         const component = await request
             .post('/graphql')
             .trustLocalhost()
-            .send(createComponent)
+            .send(createComponentMutation)
         variable.component = component.body.data.createComponent._id.toString()
     })
 
-    afterAll(() => server.close())
+    afterAll(async () => {
+        await new Service<INotification>('notifications').deleteAll()
+        await new Service<IComponent>('components').deleteAll()
+        await new Service<IUser>('users').deleteAll()
+        server.close()
+    })
 
     test('empty user', async () => {
         const response = await request
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     user: '',
@@ -62,7 +67,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     user: 'invalid',
@@ -79,7 +84,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     component: '',
@@ -96,7 +101,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     component: 'invalid',
@@ -113,7 +118,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     title: '',
@@ -130,7 +135,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                     title: '#invalid$%^title',
@@ -147,7 +152,7 @@ describe('create notification mutation', () => {
             .post('/graphql')
             .trustLocalhost()
             .send({
-                query: createNotification.query,
+                query: createNotificationMutation.query,
                 variables: {
                     ...variable,
                 },

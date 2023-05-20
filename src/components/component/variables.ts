@@ -1,4 +1,4 @@
-export const createComponent = {
+export const createComponentMutation = {
     query: /* GraphQL */ `
         mutation CreateComponent($name: String!) {
             createComponent(name: $name) {
@@ -15,10 +15,24 @@ export const createComponent = {
     },
 }
 
-export const updateComponent = {
+export const updateComponentMutation = {
     query: /* GraphQL */ `
         mutation UpdateComponent($_id: ID!, $name: String!) {
             updateComponent(_id: $_id, name: $name) {
+                _id
+                name
+                slug
+                createdAt
+                updatedAt
+            }
+        }
+    `,
+}
+
+export const componentCreatedSubscription = {
+    query: /* GraphQL */ `
+        subscription Subscription {
+            componentCreated {
                 _id
                 name
                 slug

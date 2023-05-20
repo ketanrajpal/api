@@ -1,4 +1,4 @@
-export const createNotification = {
+export const createNotificationMutation = {
     query: /* GraphQL */ `
         mutation Mutation(
             $user: ID!
